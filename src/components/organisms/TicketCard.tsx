@@ -1,30 +1,15 @@
 import { Clock, CheckCircle, Circle } from 'lucide-react';
+import { Ticket, TicketCategory, TicketStatus } from '@/types'; // 1. Importamos los tipos globales
 
-export interface Ticket {
-  id: string;
-  title: string;
-  description: string;
-  category: 'infraestructura' | 'hardware' | 'conectividad';
-  status: 'pendiente' | 'en-proceso' | 'resuelto';
-  createdAt: string;
-  createdBy: string;
-  assignedTo?: string;
-  imageUrl?: string;
-}
-
-interface TicketCardProps {
-  ticket: Ticket;
-  onClick: () => void;
-  showAssignedTo?: boolean;
-}
-
-const categoryColors = {
+// 2. Definimos los colores usando el tipo global TicketCategory
+// Así nos aseguramos de que cubra 'software', 'hardware', etc.
+const categoryColors: Record<TicketCategory, string> = {
   infraestructura: 'bg-blue-100 text-blue-700 border-blue-200',
   hardware: 'bg-orange-100 text-orange-700 border-orange-200',
-  conectividad: 'bg-purple-100 text-purple-700 border-purple-200',
+  software: 'bg-purple-100 text-purple-700 border-purple-200', // Reemplazamos conectividad por software
 };
 
-const statusConfig = {
+const statusConfig: Record<TicketStatus, { icon: any; color: string; bg: string; label: string }> = {
   pendiente: {
     icon: Circle,
     color: 'text-gray-500',
@@ -45,14 +30,23 @@ const statusConfig = {
   },
 };
 
+interface TicketCardProps {
+  // 3. Extendemos el tipo Ticket global por si necesitamos campos visuales extra (como imageUrl)
+  ticket: Ticket & { imageUrl?: string; assignedTo?: string }; 
+  onClick?: () => void; // 4. Lo hacemos opcional (?) para que no falle si no se lo pasas
+  showAssignedTo?: boolean;
+}
+
 export function TicketCard({ ticket, onClick, showAssignedTo = false }: TicketCardProps) {
-  const status = statusConfig[ticket.status];
+  // Fallback por si el status o categoria vienen con un valor no esperado
+  const status = statusConfig[ticket.status] || statusConfig['pendiente'];
+  const categoryColor = categoryColors[ticket.category] || 'bg-gray-100 text-gray-700 border-gray-200';
   const StatusIcon = status.icon;
 
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-[#5C3DFF] transition-all cursor-pointer group"
+      className={`bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-[#5C3DFF] transition-all group ${onClick ? 'cursor-pointer' : ''}`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
@@ -64,7 +58,7 @@ export function TicketCard({ ticket, onClick, showAssignedTo = false }: TicketCa
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${categoryColors[ticket.category]}`}>
+        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${categoryColor}`}>
           {ticket.category}
         </span>
         <div className={`flex items-center gap-1 px-3 py-1 rounded-full ${status.bg}`}>
