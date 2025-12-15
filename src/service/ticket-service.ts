@@ -21,6 +21,16 @@ export const ticketService = {
     }
   },
 
+  getById : async (id: string): Promise<TicketResponse> => {    
+    try {
+      const response = await api.get<TicketResponse>(`/tickets/${id}`);
+      return response.data;
+    } catch (error) { 
+      console.error("Error al obtener ticket por ID:", error);
+      throw error;
+    }
+  },
+
   IAsuggestion: async (
     description: string,
     categoryId: string
@@ -42,5 +52,11 @@ export const ticketService = {
       console.error("Error al obtener sugerencia AI:", error);
       throw error;
     }
+  
   },
+
+
+
 };
+
+

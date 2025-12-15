@@ -5,6 +5,7 @@ export type TicketStatus = 'pendiente' | 'en-proceso' | 'resuelto';
 export type TicketCategory = 'hardware' | 'software' | 'infraestructura';
 
 export interface Ticket {
+    imageUrl: any;
     id: string;
     title: string;
     description: string;
