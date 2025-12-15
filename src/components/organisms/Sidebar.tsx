@@ -1,22 +1,23 @@
 "use client";
 
 
-import { User } from "@/types/user";
+import { ADMIN } from "@/constants/constants";
+import { useAuth } from "@/context/AuthContext";
+import { UserRole } from "@/types";
 import {
   Home,
-  Plus,
   List,
   LogOut,
+  Plus,
   Shield,
-  Users,
-  BarChart3,
+  Users
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface SidebarProps {
-  role: "coder" | "admin";
-  setUser: (user: User) => void;
+  role: UserRole;
 }
 
 type View =
@@ -28,53 +29,61 @@ type View =
   | "users"
   | "detail";
 
-export default function Sidebar({ role = "admin", setUser}: SidebarProps) {
+export default function Sidebar({ role }: SidebarProps) {
+
+  const { logout } = useAuth();
+  const pathname = usePathname();
+
   const coderMenuItems = [
-    { id: "dashboard", url: "/dashboard", icon: Home, label: "Dashboard" },
+    { id: "dashboard", url: "/coder", icon: Home, label: "Dashboard" },
     { id: "create", url: "/tickets/create", icon: Plus, label: "Nuevo Ticket" },
     { id: "my-tickets", url: "/tickets", icon: List, label: "Mis Tickets" },
   ];
 
   const adminMenuItems = [
-    { id: "dashboard", url: "/dashboard", icon: Home, label: "Dashboard" },
+    { id: "dashboard", url: "/admin", icon: Home, label: "Dashboard" },
     {
       id: "all-tickets",
       url: "/tickets",
       icon: List,
       label: "Todos los Tickets",
     },
-    {
-      id: "analytics",
-      url: "/analytics",
-      icon: BarChart3,
-      label: "Analíticas",
-    },
+
     { id: "users", url: "/users", icon: Users, label: "Usuarios" },
   ];
 
-  const menuItems = role === "admin" ? adminMenuItems : coderMenuItems;
+  useEffect(() => {
+    const path = pathname;
+    const allMenuItems = [...coderMenuItems, ...adminMenuItems];
+    const matchedItem = allMenuItems.find(item => item.url === path);
+    
+    if (matchedItem) {
+      handleViewChange(matchedItem.id);
+    }
+  }, [pathname]);
+
+  const menuItems = role === ADMIN ? adminMenuItems : coderMenuItems;
 
   const [currentView, setCurrentView] = useState<View>("dashboard");
 
   const handleLogout = () => {
-    setUser({
-      email: "",
-      name: "",
-      role: "coder",
-    });
-    window.location.href = "/login";
-    // setSelectedTicket(null);
+    logout()
   };
 
   const handleViewChange = (view: string) => {
     setCurrentView(view as View);
+
+
     // setSelectedTicket(null);
   };
 
+
+
+
   return (
-    <aside className="w-64 min-h-screen bg-[#1A1A2E] text-white flex flex-col">
+    <aside className="w-64 sticky top-0 left-0 h-svh z-10 bg-[#1A1A2E] text-white flex flex-col overflow-hidden">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
+      <div className="px-6 py-4 my-auto border-b border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#5C3DFF] to-[#7D5CFF] flex items-center justify-center">
             <Shield className="w-6 h-6" />
@@ -116,7 +125,7 @@ export default function Sidebar({ role = "admin", setUser}: SidebarProps) {
       <div className="p-4 border-t border-gray-700">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-all"
         >
           <LogOut className="w-5 h-5" />
           <span className="text-sm font-medium">Cerrar Sesión</span>

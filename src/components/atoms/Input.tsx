@@ -16,6 +16,7 @@ export const Input = ({ icon: Icon, rightElement, className, ...props }: InputPr
         className={`w-full py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C3DFF] focus:border-transparent ${
           Icon ? 'pl-10' : 'pl-4'
         } ${rightElement ? 'pr-12' : 'pr-4'} ${className}`}
+        autoComplete="on"
         {...props}
       />
       {rightElement && (

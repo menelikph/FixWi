@@ -1,5 +1,6 @@
 import React from 'react';
 import { TicketCard } from '@/components/organisms/TicketCard';
+import { TicketList } from './tickectList';
 // Si tienes un componente de Stats o Filtros, irían aquí
 
 // Datos de prueba (Mocks) para que veas algo en pantalla
@@ -48,9 +49,9 @@ export default function DashboardAdmin() {
           <h1 className="text-2xl font-bold text-[#1A1A2E]">Panel de Administrador</h1>
           <p className="text-gray-500">Gestión general de incidencias</p>
         </div>
-        <button className="bg-[#5C3DFF] text-white px-4 py-2 rounded-lg hover:bg-[#4A2FCC] transition-colors">
+        {/* <button className="bg-[#5C3DFF] text-white px-4 py-2 rounded-lg hover:bg-[#4A2FCC] transition-colors">
           + Nuevo Ticket
-        </button>
+        </button> */}
       </div>
 
       {/* Área de Estadísticas (Placeholder) */}
@@ -72,10 +73,8 @@ export default function DashboardAdmin() {
       {/* Grid de Tickets */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-[#1A1A2E]">Tickets Recientes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_TICKETS.map((ticket) => (
-            <TicketCard key={ticket.id} ticket={ticket} />
-          ))}
+        <div className="w-full ">
+          <TicketList page="none" pageSize={3} />
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-export type UserRole = 'coder' | 'admin' | 'guest';
+export type UserRole = 'USER' | 'ADMIN' | 'GUEST';
 
 export type TicketStatus = 'pendiente' | 'en-proceso' | 'resuelto';
 
