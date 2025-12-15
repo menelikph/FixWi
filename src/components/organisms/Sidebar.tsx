@@ -37,13 +37,13 @@ export default function Sidebar({ role }: SidebarProps) {
   const coderMenuItems = [
     { id: "dashboard", url: "/coder", icon: Home, label: "Dashboard" },
     { id: "create", url: "/tickets/create", icon: Plus, label: "Nuevo Ticket" },
-    { id: "my-tickets", url: "/tickets", icon: List, label: "Mis Tickets" },
+    { id: "tickets", url: "/tickets", icon: List, label: "Mis Tickets" },
   ];
 
   const adminMenuItems = [
     { id: "dashboard", url: "/admin", icon: Home, label: "Dashboard" },
     {
-      id: "all-tickets",
+      id: "tickets",
       url: "/tickets",
       icon: List,
       label: "Todos los Tickets",
