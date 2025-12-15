@@ -2,6 +2,7 @@
 
 import { Bell, Search, User } from 'lucide-react';
 import { UserRole } from '@/types';
+import { ADMIN } from '@/constants/constants';
 
 interface TopbarProps {
   userName: string;
@@ -10,7 +11,7 @@ interface TopbarProps {
 
 export function Topbar({ userName, role }: TopbarProps) {
   return (
-    <header className="bg-white border-b border-gray-200 px-8 py-4">
+    <header className="bg-white border-b sticky top-0 w-full right-0 border-gray-200 px-8 py-4">
       <div className="flex items-center justify-between">
         {/* Search Bar */}
         <div className="flex-1 max-w-xl">
@@ -37,7 +38,7 @@ export function Topbar({ userName, role }: TopbarProps) {
             <div className="text-right">
               <p className="text-sm font-medium text-gray-900">{userName}</p>
               <p className="text-xs text-gray-500 capitalize">
-                {role === 'admin' ? 'Administrador' : 'Coder'}
+                {role === ADMIN ? 'Administrador' : 'Coder'}
               </p>
             </div>
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5C3DFF] to-[#7D5CFF] flex items-center justify-center text-white font-medium">
