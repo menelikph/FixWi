@@ -47,3 +47,5 @@ export interface TicketListResponse {
   numberOfElements: number;
   empty: boolean;
 }
+
+export type TicketStatus = "OPEN" | "CLOSE" | "IN_PROGRESS";

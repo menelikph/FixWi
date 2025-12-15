@@ -4,6 +4,7 @@ import { ticketService } from "@/service/ticket-service";
 import { Ticket, TicketCategory, TicketStatus } from "@/types";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import TicketDetail from "../organisms/TicketDetail";
 
 interface TicketListProps {
   page: "all" | "my-tickets" | "none";
@@ -141,7 +142,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
           <TicketCard
             key={ticket.id}
             ticket={ticket}
-            onClick={() => console.log("Ticket clicked:", ticket.id)}
+            onClick={() => (TicketDetail)}
           />
         ))}
       </div>
