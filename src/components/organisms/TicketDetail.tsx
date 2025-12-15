@@ -1,120 +1,98 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Clock,
   User,
   Tag,
   Calendar,
-  Image as ImageIcon,
   Loader2,
-  AlertTriangle,
 } from "lucide-react";
-import { Ticket, TicketStatus } from "@/types";
-import { TicketResponse } from "@/types/ticket";
+
+// Importamos DIRECTAMENTE los tipos del backend
+import { TicketResponse } from "@/types/ticket"; 
 import { ticketService } from "@/service/ticket-service";
-
-
+import { useAuth } from "@/context/AuthContext";
 
 interface TicketDetailProps {
   id: string;
-  onBack: () => void;
-  isAdmin: boolean;
-  onUpdateStatus?: (newStatus: TicketStatus) => Promise<void>;
 }
 
-const initialTicket: TicketResponse = {
-  id: 0,
-  title: "Cargando...",
-  description: "Cargando descripción...",
-  categoryName: "software",
-  status: "OPEN",
-  userId: 0,
-  createDate: new Date().toISOString(),
-}
+// Configuración VISUAL según el estado del backend (Sin transformar datos)
+const STATUS_CONFIG = {
+  OPEN: { 
+    label: "Pendiente", 
+    color: "bg-gray-100 text-gray-700 border-gray-300" 
+  },
+  IN_PROGRESS: { 
+    label: "En Proceso", 
+    color: "bg-orange-100 text-orange-700 border-orange-300" 
+  },
+  CLOSE: { 
+    label: "Resuelto", 
+    color: "bg-green-100 text-green-700 border-green-300" 
+  },
+};
 
-export default function TicketDetail({ id, onBack, isAdmin, onUpdateStatus }: TicketDetailProps) {
-  // Simulación de datos de ticket para el ejemplo
+export default function TicketDetail({ id }: TicketDetailProps) {
+  const router = useRouter();
+  const { userRole } = useAuth();
 
-  const [ticket, setTicket] = useState<TicketResponse>(initialTicket); // Inicializamos con valores por defecto
-  const [isLoading, setIsLoading] = useState(true); // Nuevo estado de carga
-  const [error, setError] = useState<string | null>(null); // Nuevo estado de error
-  const [selectedStatus, setSelectedStatus] = useState<TicketResponse["status"]>(initialTicket.status);
-  // Usamos el status del ticket como estado inicial
+  // Usamos el tipo directo del Backend (TicketResponse)
+  const [ticket, setTicket] = useState<TicketResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleStatusChange = (newStatus: TicketResponse["status"]) => {
-    setSelectedStatus(newStatus);
-    onUpdateStatus?.(newStatus as Ticket["status"]);
-  };
+  useEffect(() => {
+    if (id) loadTicket();
+  }, [id]);
 
-  const fetchTicket = useCallback(async (ticketId: string) => {
-    setIsLoading(true);
-    setError(null);
+  const loadTicket = async () => {
     try {
-      const data = await ticketService.getById(ticketId);
+      setIsLoading(true);
+      // Guardamos la respuesta DIRECTA, sin mappers ni transformaciones
+      const data = await ticketService.getById(id);
       setTicket(data);
-      setSelectedStatus(data.status); // Sincronizar el estado del selector con los datos
-    } catch (err) {
-      console.error("Fallo al cargar el ticket:", err);
-      setError("No se pudo cargar la información del ticket. Intente nuevamente.");
+    } catch (error) {
+      console.error("Error cargando ticket:", error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    if (id) {
-      fetchTicket(id);
+ const handleStatusChange = async (newStatus: "OPEN" | "IN_PROGRESS" | "CLOSE") => {
+    if (!ticket) return;
+    if (ticket.status === newStatus) return;
+
+    try {
+      setIsUpdating(true);
+      
+      const updatedTicket = await ticketService.updateStatus(ticket.id.toString(), newStatus);
+      
+      // Actualizamos la vista con el resultado de esa llamada
+      setTicket(updatedTicket);
+      
+    } catch (error) {
+      console.error("Error actualizando:", error);
+    
+    } finally {
+      setIsUpdating(false);
     }
-  }, [id, fetchTicket]); // Dependencia del 'id' y 'fetchTicket'
+  };
 
-  const statusOptions: {
-    value: TicketResponse["status"];
-    label: string;
-    color: string;
-  }[] = [
-      {
-        value: "OPEN", // Corregido de 'pendiente'
-        label: "Pendiente",
-        color: "bg-gray-100 text-gray-700 border-gray-300",
-      },
-      {
-        value: "IN_PROGRESS", // Corregido de 'en-proceso'
-        label: "En Proceso",
-        color: "bg-orange-100 text-orange-700 border-orange-300",
-      },
-      {
-        value: "CLOSE", // Corregido de 'resuelto'
-        label: "Resuelto",
-        color: "bg-green-100 text-green-700 border-green-300",
-      },
-    ];
+  if (isLoading) return <div className="p-10 flex justify-center"><Loader2 className="animate-spin text-[#5C3DFF]" /></div>;
+  if (!ticket) return <div className="p-10 text-center">Ticket no encontrado</div>;
 
-  if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto py-20 flex flex-col items-center justify-center bg-white rounded-2xl shadow-xl">
-        <Loader2 className="w-8 h-8 text-[#5C3DFF] animate-spin mb-4" />
-        <p className="text-gray-600 font-medium">Cargando detalles del ticket...</p>
-      </div>
-    );
-  }
-
-  // Pantalla de Error
-  if (error) {
-    return (
-      <div className="max-w-4xl mx-auto py-20 flex flex-col items-center justify-center bg-red-50 border border-red-300 rounded-2xl shadow-xl">
-        <AlertTriangle className="w-8 h-8 text-red-600 mb-4" />
-        <p className="text-red-700 font-medium">{error}</p>
-      </div>
-    );
-  }
+  // Helper para acceder a la config visual actual de forma segura
+  const currentStatus = STATUS_CONFIG[ticket.status] || STATUS_CONFIG.OPEN;
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
+      {/* Botón Volver */}
       <button
-        onClick={onBack}
+        onClick={() => router.back()}
         className="flex items-center gap-2 text-gray-600 hover:text-[#5C3DFF] mb-6 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -122,160 +100,89 @@ export default function TicketDetail({ id, onBack, isAdmin, onUpdateStatus }: Ti
       </button>
 
       <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-        {/* Title Section */}
+        {/* Encabezado */}
         <div className="bg-gradient-to-r from-[#5C3DFF] to-[#7D5CFF] px-8 py-6 text-white">
-          <h1 className="text-3xl font-bold mb-2">
-            {ticket.title}
-          </h1>
+          <h1 className="text-3xl font-bold mb-2">{ticket.title}</h1>
           <div className="flex items-center gap-4 text-sm text-white/80">
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               <span>
-                {new Date(ticket.createDate).toLocaleDateString(
-                  "es-ES",
-                  {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  },
-                )}
+                {/* Usamos createDate directo del backend */}
+                {new Date(ticket.createDate).toLocaleDateString("es-ES", {
+                  day: "numeric", month: "long", year: "numeric"
+                })}
               </span>
             </div>
             <div className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              <span>Usuario ID: {ticket.userId}</span>
+              {/* Usamos userId directo */}
+              <span>Usuario #{ticket.userId}</span>
             </div>
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-8 space-y-6">
-          {/* Status Update (Admin Only) */}
-          {isAdmin && onUpdateStatus && (
+          {/* Panel de Admin para cambiar estado */}
+          {(userRole === "ADMIN") && (
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-5">
               <label className="block text-sm font-medium text-gray-900 mb-3">
-                Actualizar Estado del Ticket
+                Cambiar Estado
               </label>
               <div className="flex gap-3">
-                {statusOptions.map((option) => (
+                {/* Iteramos sobre las llaves de STATUS_CONFIG (OPEN, IN_PROGRESS, CLOSE) */}
+                {(Object.keys(STATUS_CONFIG) as Array<keyof typeof STATUS_CONFIG>).map((statusKey) => (
                   <button
-                    key={option.value}
-                    onClick={() =>
-                      handleStatusChange(option.value)
-                    }
-                    className={`flex-1 px-4 py-3 rounded-lg border-2 font-medium transition-all ${selectedStatus === option.value
-                      ? option.color
-                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-                      }`}
+                    key={statusKey}
+                    onClick={() => handleStatusChange(statusKey)}
+                    disabled={isUpdating || ticket.status === statusKey}
+                    className={`flex-1 px-4 py-2 rounded-lg border font-medium transition-all ${
+                      ticket.status === statusKey
+                        ? STATUS_CONFIG[statusKey].color // Estilo activo
+                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50" // Estilo inactivo
+                    } ${isUpdating ? "opacity-50" : ""}`}
                   >
-                    {option.label}
+                    {STATUS_CONFIG[statusKey].label}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Category */}
+          {/* Grid de Detalles */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Categoría */}
             <div>
               <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
                 <Tag className="w-4 h-4" />
                 <span>Categoría</span>
               </div>
-              <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium capitalize">
+              {/* Mostramos categoryName directo del backend */}
+              <span className="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium">
                 {ticket.categoryName}
               </span>
             </div>
 
-            {/* Status */}
+            {/* Estado Actual */}
             <div>
               <div className="flex items-center gap-2 text-sm font-medium text-gray-500 mb-2">
                 <Clock className="w-4 h-4" />
-                <span>Estado Actual</span>
+                <span>Estado</span>
               </div>
-              <span
-                className={`inline-block px-4 py-2 rounded-lg font-medium ${statusOptions.find(
-                  (s) => s.value === selectedStatus,
-                )?.color
-                  }`}
-              >
-                {
-                  statusOptions.find(
-                    (s) => s.value === selectedStatus,
-                  )?.label
-                }
+              <span className={`inline-block px-4 py-2 rounded-lg font-medium ${currentStatus.color}`}>
+                {currentStatus.label}
               </span>
             </div>
           </div>
 
-          {/* Description */}
+          {/* Descripción */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              Descripción
-            </h3>
-            <p className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
+            <p className="text-gray-600 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
               {ticket.description}
             </p>
-          </div>
-
-          {/* History Timeline */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Historial
-            </h3>
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-[#5C3DFF]" />
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="font-medium text-gray-900 mb-1">
-                      Ticket Creado
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {ticket.userId} creó este ticket
-                    </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {new Date(
-                        ticket.createDate,
-                      ).toLocaleString("es-ES")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {selectedStatus !== "OPEN" && (
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-[#FF6A4A]" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="font-medium text-gray-900 mb-1">
-                        Estado Actualizado
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        El ticket pasó a :
-                        {
-                          statusOptions.find(
-                            (s) => s.value === selectedStatus,
-                          )?.label
-                        }
-                        .
-                      </p>
-                      <p className="text-xs text-gray-500 mt-2">
-                        {new Date().toLocaleString("es-ES")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
     </div>
-  )
-};
+  );
+}

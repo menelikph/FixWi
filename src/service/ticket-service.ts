@@ -1,5 +1,5 @@
 import api from "@/lib/api/axiosInterceptor";
-import { TicketFormData, TicketListResponse, TicketResponse } from "@/types/ticket";
+import { TicketFormData, TicketListResponse, TicketResponse , TicketMetrics} from "@/types/ticket";
 
 export const ticketService = {
   createTicket: async (form: TicketFormData): Promise<TicketResponse> => {
@@ -11,6 +11,7 @@ export const ticketService = {
       throw error;
     }
   },
+  
   getTickets: async (sizepage?: number): Promise<TicketListResponse> => {
     try {
       const response = await api.get<TicketListResponse>(`/tickets?size=${sizepage}`);
@@ -27,6 +28,26 @@ export const ticketService = {
       return response.data;
     } catch (error) { 
       console.error("Error al obtener ticket por ID:", error);
+      throw error;
+    }
+  },
+
+  updateStatus: async (id: string, status: "OPEN" | "IN_PROGRESS" | "CLOSE"): Promise<TicketResponse> => {
+    try {
+      const response = await api.patch<TicketResponse>(`/tickets/${id}/status`, { status });
+      return response.data;
+    } catch (error) {
+      console.error("Error al actualizar estado:", error);
+      throw error;
+    }
+  },
+
+  getGeneralMetrics: async (): Promise<TicketMetrics> => {
+    try {
+      const response = await api.get<TicketMetrics>("/metrics");
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener métricas:", error);
       throw error;
     }
   },

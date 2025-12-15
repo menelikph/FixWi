@@ -49,3 +49,10 @@ export interface TicketListResponse {
 }
 
 export type TicketStatus = "OPEN" | "CLOSE" | "IN_PROGRESS";
+
+export interface TicketMetrics {
+  totalTickets: number;
+  openTickets: number;
+  closeTickets: number;
+  inProgressTickets: number;
+}
