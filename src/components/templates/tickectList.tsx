@@ -134,7 +134,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
       <div className="flex items-center justify-between mb-6">
         {page === "all" ? (
           <h2 className="text-2xl font-bold text-gray-900">
-            Todos Tickets ({tickets.length})
+
           </h2>
         ) : page === "my-tickets" ? (
           <h2 className="text-2xl font-bold text-gray-900">
