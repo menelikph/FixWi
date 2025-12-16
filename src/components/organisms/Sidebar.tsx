@@ -1,17 +1,9 @@
 "use client";
 
-
 import { ADMIN } from "@/constants/constants";
 import { useAuth } from "@/context/AuthContext";
 import { UserRole } from "@/types";
-import {
-  Home,
-  List,
-  LogOut,
-  Plus,
-  Shield,
-  Users
-} from "lucide-react";
+import { Home, List, LogOut, Plus, Shield, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -30,9 +22,9 @@ type View =
   | "detail";
 
 export default function Sidebar({ role }: SidebarProps) {
-
   const { logout } = useAuth();
   const pathname = usePathname();
+  const [currentView, setCurrentView] = useState<View>("dashboard");
 
   const coderMenuItems = [
     { id: "dashboard", url: "/coder", icon: Home, label: "Dashboard" },
@@ -51,34 +43,26 @@ export default function Sidebar({ role }: SidebarProps) {
 
     { id: "users", url: "/users", icon: Users, label: "Usuarios" },
   ];
-
-  useEffect(() => {
-    const path = pathname;
-    const allMenuItems = [...coderMenuItems, ...adminMenuItems];
-    const matchedItem = allMenuItems.find(item => item.url === path);
-    
-    if (matchedItem) {
-      handleViewChange(matchedItem.id);
-    }
-  }, [pathname]);
-
   const menuItems = role === ADMIN ? adminMenuItems : coderMenuItems;
 
-  const [currentView, setCurrentView] = useState<View>("dashboard");
-
   const handleLogout = () => {
-    logout()
+    logout();
   };
 
   const handleViewChange = (view: string) => {
     setCurrentView(view as View);
 
-
     // setSelectedTicket(null);
   };
+  useEffect(() => {
+    const path = pathname;
+    const allMenuItems = [...coderMenuItems, ...adminMenuItems];
+    const matchedItem = allMenuItems.find((item) => item.url === path);
 
-
-
+    if (matchedItem) {
+      handleViewChange(matchedItem.id);
+    }
+  }, [pathname]);
 
   return (
     <aside className="w-64 sticky top-0 left-0 h-svh z-10 bg-[#1A1A2E] text-white flex flex-col overflow-hidden">
