@@ -89,7 +89,10 @@ export default function Sidebar({ role }: SidebarProps) {
             <Shield className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">FIXWI</h1>
+            <h1 className="text-xl font-bold">
+              <span className="text-white">Fix</span>
+              <span className="text-[#5C3DFF]">Wi</span>
+            </h1>
             <p className="text-xs text-gray-400">Sistema de Reportes</p>
           </div>
         </div>
