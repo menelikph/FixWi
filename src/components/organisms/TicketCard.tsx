@@ -1,14 +1,19 @@
+/**
+ * TicketCard Component
+ * Displays ticket information in a card format with status, category, and optional image
+ */
 import { Clock, CheckCircle, Circle } from 'lucide-react';
-import { Ticket, TicketCategory, TicketStatus } from '@/types'; // 1. Importamos los tipos globales
+import { Ticket, TicketCategory, TicketStatus } from '@/types';
 
-// 2. Definimos los colores usando el tipo global TicketCategory
-// Así nos aseguramos de que cubra 'software', 'hardware', etc.
+// Define colors using global TicketCategory type
 const categoryColors: Record<TicketCategory, string> = {
   infraestructura: 'bg-blue-100 text-blue-700 border-blue-200',
   hardware: 'bg-orange-100 text-orange-700 border-orange-200',
-  software: 'bg-purple-100 text-purple-700 border-purple-200', // Reemplazamos conectividad por software
+  software: 'bg-purple-100 text-purple-700 border-purple-200',
 };
 
+// Status configuration with icons, colors, and Spanish labels
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusConfig: Record<TicketStatus, { icon: any; color: string; bg: string; label: string }> = {
   pendiente: {
     icon: Circle,
@@ -31,14 +36,14 @@ const statusConfig: Record<TicketStatus, { icon: any; color: string; bg: string;
 };
 
 interface TicketCardProps {
-  // 3. Extendemos el tipo Ticket global por si necesitamos campos visuales extra (como imageUrl)
-  ticket: Ticket & { imageUrl?: string; assignedTo?: string }; 
-  onClick?: () => void; // 4. Lo hacemos opcional (?) para que no falle si no se lo pasas
-  showAssignedTo?: boolean;
+  // Extended Ticket type with optional visual fields
+  ticket: Ticket & { imageUrl?: string; assignedTo?: string };
+  onClick?: () => void; // Optional click handler
+  showAssignedTo?: boolean; // Toggle assigned user display
 }
 
 export function TicketCard({ ticket, onClick, showAssignedTo = false }: TicketCardProps) {
-  // Fallback por si el status o categoria vienen con un valor no esperado
+  // Fallback to default values for invalid status or category
   const status = statusConfig[ticket.status] || statusConfig['pendiente'];
   const categoryColor = categoryColors[ticket.category] || 'bg-gray-100 text-gray-700 border-gray-200';
   const StatusIcon = status.icon;

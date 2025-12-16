@@ -1,10 +1,13 @@
+/**
+ * TicketList Component
+ * Displays a grid of tickets with loading, error, and empty states
+ */
 "use client";
 import { TicketCard } from "@/components/organisms/TicketCard";
 import { ticketService } from "@/service/ticket-service";
 import { Ticket, TicketCategory, TicketStatus } from "@/types";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import TicketDetail from "../organisms/TicketDetail";
 import { useRouter } from "next/navigation";
 
 interface TicketListProps {
@@ -16,6 +19,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
   
   const router = useRouter();
 
+  // Component state
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,12 +28,13 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
     loadTickets();
   }, []);
 
+  // Fetch and transform tickets from backend
   const loadTickets = async () => {
     try {
       setIsLoading(true);
       setError(null);
       const data = await ticketService.getTickets(pageSize);
-      // Transformar TicketResponse a Ticket
+      // Transform TicketResponse to Ticket type
       const transformedTickets: Ticket[] = data.content.map((ticket) => ({
         id: ticket.id.toString(),
         title: ticket.title,
@@ -51,7 +56,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
     }
   };
 
-  // Mapear el nombre de categoría del backend a nuestro tipo
+  // Map backend category name to our type
   const mapCategoryName = (categoryName: string): TicketCategory => {
     const normalized = categoryName.toLowerCase();
     if (normalized.includes("hardware")) return "hardware";
@@ -61,10 +66,10 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
       normalized.includes("infrastructure")
     )
       return "infraestructura";
-    return "software"; // Por defecto
+    return "software"; // Default fallback
   };
 
-  // Mapear el status del backend a nuestro tipo
+  // Map backend status to our type
   const mapStatus = (status: string): TicketStatus => {
     switch (status) {
       case "OPEN":
@@ -78,6 +83,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
     }
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -89,6 +95,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -105,6 +112,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
     );
   }
 
+  // Empty state
   if (tickets.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -120,6 +128,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
     );
   }
 
+  // Render ticket grid
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">

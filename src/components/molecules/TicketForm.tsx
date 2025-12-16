@@ -7,15 +7,22 @@ import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
+/**
+ * TicketForm Component
+ * Form for creating new support tickets with AI suggestions
+ */
 export default function TicketForm() {
   const { createTicket } = ticketService;
   const { userId } = useAuth();
+
+  // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string>("");
   const [showAISuggestion, setShowAISuggestion] = useState(false);
   const [iaSuggestion, setIaSuggestion] = useState("");
 
+  // Handle ticket creation
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -40,6 +47,7 @@ export default function TicketForm() {
     }
   };
 
+  // Get AI suggestion for Software category
   const GetIaSuggestion = async (categoryName: string) => {
     if (categoryName !== "Software") return;
 
@@ -57,6 +65,7 @@ export default function TicketForm() {
     }
   };
 
+  // Clear all form fields
   const clearForm = () => {
     setTitle("");
     setDescription("");
@@ -65,7 +74,7 @@ export default function TicketForm() {
 
   return (
     <form onSubmit={handleSubmit} className="p-8 space-y-6">
-      {/* Title */}
+      {/* Title input */}
       <div>
         <label
           htmlFor="title"
@@ -84,7 +93,7 @@ export default function TicketForm() {
         />
       </div>
 
-      {/* Description */}
+      {/* Description textarea */}
       <div>
         <label
           htmlFor="description"
@@ -103,7 +112,7 @@ export default function TicketForm() {
         />
       </div>
 
-      {/* Category */}
+      {/* Category selection grid */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Categoría
@@ -132,7 +141,7 @@ export default function TicketForm() {
         </div>
       </div>
 
-      {/* AI Suggestion */}
+      {/* AI Suggestion box (shown only for Software category) */}
       {showAISuggestion && (
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-5">
           <div className="flex items-start gap-3">
@@ -145,6 +154,7 @@ export default function TicketForm() {
               </h4>
               <p className="text-sm text-gray-600">{iaSuggestion}</p>
             </div>
+            {/* Close suggestion button */}
             <button
               type="button"
               onClick={() => setShowAISuggestion(false)}
@@ -156,7 +166,7 @@ export default function TicketForm() {
         </div>
       )}
 
-      {/* Buttons */}
+      {/* Action buttons */}
       <div className="flex gap-3 pt-4">
         <button
           type="button"

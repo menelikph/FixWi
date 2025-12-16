@@ -7,14 +7,20 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
+/**
+ * LoginForm Component
+ * Handles user authentication with email and password
+ */
 export function LoginForm() {
   const { login } = useAuth();
+  
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -28,15 +34,13 @@ export function LoginForm() {
     }
   };
 
-
-
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
+      {/* Header section with logo and description */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
+          {/* Logo icon */}
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#5C3DFF] to-[#7D5CFF] flex items-center justify-center">
-            {/* Icono SVG original del diseño */}
             <svg
               className="w-7 h-7 text-white"
               viewBox="0 0 24 24"
@@ -48,6 +52,7 @@ export function LoginForm() {
               <path d="m9 12 2 2 4-4" />
             </svg>
           </div>
+          {/* Brand name */}
           <div>
             <h1 className="text-3xl font-bold text-[#1A1A2E]">FIXWI</h1>
             <p className="text-sm text-gray-500">by Riwi</p>
@@ -58,6 +63,7 @@ export function LoginForm() {
         </p>
       </div>
 
+      {/* Email input field */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Correo Electrónico
@@ -72,6 +78,7 @@ export function LoginForm() {
         />
       </div>
 
+      {/* Password input field with toggle visibility */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Contraseña
@@ -99,7 +106,7 @@ export function LoginForm() {
         />
       </div>
 
-      {/* SECCIÓN RECUPERADA: Recordar sesión y Olvidé contraseña */}
+      {/* Remember me and forgot password - currently disabled */}
       {/* <div className="flex items-center justify-between">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -115,11 +122,12 @@ export function LoginForm() {
         </a>
       </div> */}
 
-      <Button type="submit"  disabled={loading}>
+      {/* Submit button */}
+      <Button type="submit" disabled={loading}>
         {loading ? "Iniciando..." : "Iniciar Sesión"}
       </Button>
 
-      {/* Credenciales Demo originales */}
+      {/* Demo credentials - currently disabled */}
       {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <p className="text-xs text-gray-600 mb-2 font-medium">Credenciales de prueba:</p>
         <div className="space-y-1 text-xs text-gray-500">

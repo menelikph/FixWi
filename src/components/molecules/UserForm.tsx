@@ -3,12 +3,19 @@ import { UserFormRquest } from "@/types/user";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
+/**
+ * UserForm Component
+ * Form for creating new users (admin functionality)
+ */
 export default function UserForm() {
   const { createUser } = userService;
+  
+  // Form state
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState<string>("");
 
+  // Handle user creation
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -31,6 +38,7 @@ export default function UserForm() {
     }
   };
 
+  // Clear all form fields
   const clearForm = () => {
     setFullName("");
     setEmail("");
@@ -39,7 +47,7 @@ export default function UserForm() {
 
   return (
     <form onSubmit={handleSubmit} className="p-8 space-y-6">
-      {/* Title */}
+      {/* Full name input */}
       <div>
         <label
           htmlFor="title"
@@ -57,7 +65,8 @@ export default function UserForm() {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C3DFF] focus:border-transparent"
         />
       </div>
-      {/* email */}
+      
+      {/* Email input */}
       <div>
         <label
           htmlFor="title"
@@ -75,7 +84,8 @@ export default function UserForm() {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5C3DFF] focus:border-transparent"
         />
       </div>
-      {/* password */}
+      
+      {/* Password input */}
       <div>
         <label
           htmlFor="title"
@@ -94,7 +104,7 @@ export default function UserForm() {
         />
       </div>
 
-      {/* Buttons */}
+      {/* Action buttons */}
       <div className="flex gap-3 pt-4">
         <button
           type="button"

@@ -1,7 +1,13 @@
+/**
+ * Ticket Service
+ * Handles all ticket-related API operations including CRUD and AI suggestions
+ */
 import api from "@/lib/api/axiosInterceptor";
 import { TicketFormData, TicketListResponse, TicketResponse , TicketMetrics} from "@/types/ticket";
 
+// Ticket service with all API methods
 export const ticketService = {
+  // Create a new ticket
   createTicket: async (form: TicketFormData): Promise<TicketResponse> => {
     try {
       const response = await api.post<TicketResponse>("/tickets", form);
@@ -12,6 +18,7 @@ export const ticketService = {
     }
   },
   
+  // Get paginated list of tickets
   getTickets: async (sizepage?: number): Promise<TicketListResponse> => {
     try {
       const response = await api.get<TicketListResponse>(`/tickets?size=${sizepage}`);
@@ -22,6 +29,7 @@ export const ticketService = {
     }
   },
 
+  // Get ticket by ID
   getById : async (id: string): Promise<TicketResponse> => {    
     try {
       const response = await api.get<TicketResponse>(`/tickets/${id}`);
@@ -32,6 +40,7 @@ export const ticketService = {
     }
   },
 
+  // Update ticket status
   updateStatus: async (id: string, status: "OPEN" | "IN_PROGRESS" | "CLOSE"): Promise<TicketResponse> => {
     try {
       const response = await api.patch<TicketResponse>(`/tickets/${id}/status`, { status });
@@ -42,6 +51,7 @@ export const ticketService = {
     }
   },
 
+  // Get general ticket metrics (pending, in progress, closed)
   getGeneralMetrics: async (): Promise<TicketMetrics> => {
     try {
       const response = await api.get<TicketMetrics>("/metrics");
@@ -52,6 +62,7 @@ export const ticketService = {
     }
   },
 
+  // Get AI suggestion based on description and category
   IAsuggestion: async (
     description: string,
     categoryId: string
@@ -63,7 +74,7 @@ export const ticketService = {
           description: description,
         },
       });
-      debugger;
+      debugger; // Debug point for AI response
       if (response.status === 204) {
         return "No hay sugerencias disponibles.";
       }

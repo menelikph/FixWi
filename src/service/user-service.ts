@@ -1,6 +1,7 @@
 import api from "@/lib/api/axiosInterceptor";
 import { User, UserFormRquest } from "@/types/user";
 
+// User service with all API methods related to user management
 export const userService = {
   createUser: async (form: UserFormRquest): Promise<User> => {
     try {
