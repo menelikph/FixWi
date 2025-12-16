@@ -4,6 +4,8 @@ import { ticketService } from "@/service/ticket-service";
 import { Ticket, TicketCategory, TicketStatus } from "@/types";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import TicketDetail from "../organisms/TicketDetail";
+import { useRouter } from "next/navigation";
 
 interface TicketListProps {
   page: "all" | "my-tickets" | "none";
@@ -11,6 +13,9 @@ interface TicketListProps {
 }
 
 export function TicketList({ page, pageSize = 100 }: TicketListProps) {
+  
+  const router = useRouter();
+
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +146,7 @@ export function TicketList({ page, pageSize = 100 }: TicketListProps) {
           <TicketCard
             key={ticket.id}
             ticket={ticket}
-            onClick={() => console.log("Ticket clicked:", ticket.id)}
+            onClick={() => router.push(`/tickets/${ticket.id}`)}
           />
         ))}
       </div>
