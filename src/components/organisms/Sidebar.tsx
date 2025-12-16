@@ -29,6 +29,7 @@ type View =
 export default function Sidebar({ role }: SidebarProps) {
   const { logout } = useAuth();
   const pathname = usePathname();
+  const [currentView, setCurrentView] = useState<View>("dashboard");
 
   // Menu items for coder role
   const coderMenuItems = [
@@ -49,8 +50,18 @@ export default function Sidebar({ role }: SidebarProps) {
 
     { id: "users", url: "/users", icon: Users, label: "Usuarios" },
   ];
+  const menuItems = role === ADMIN ? adminMenuItems : coderMenuItems;
 
-  // Update active view based on current path
+  const handleLogout = () => {
+    logout();
+  };
+
+  // Handle view change and update active state
+  const handleViewChange = (view: string) => {
+    setCurrentView(view as View);
+
+    // setSelectedTicket(null);
+  };
   useEffect(() => {
     const path = pathname;
     const allMenuItems = [...coderMenuItems, ...adminMenuItems];
@@ -60,21 +71,6 @@ export default function Sidebar({ role }: SidebarProps) {
       handleViewChange(matchedItem.id);
     }
   }, [pathname]);
-
-  // Select menu based on role
-  const menuItems = role === ADMIN ? adminMenuItems : coderMenuItems;
-
-  const [currentView, setCurrentView] = useState<View>("dashboard");
-
-  // Handle logout action
-  const handleLogout = () => {
-    logout();
-  };
-
-  // Handle view change and update active state
-  const handleViewChange = (view: string) => {
-    setCurrentView(view as View);
-  };
 
   return (
     <aside className="w-64 sticky top-0 left-0 h-svh z-10 bg-[#1A1A2E] text-white flex flex-col overflow-hidden">
