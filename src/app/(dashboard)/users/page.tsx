@@ -1,7 +1,9 @@
 "use client";
 import UserForm from "@/components/molecules/UserForm";
 
-export default function CreateUserPage() {
+// CreateUserPage Component
+// Page for creating a new user
+export default function CreateUserPage() { // Render the user creation form inside a styled container
   return (
     <div className="max-w-3xl mx-auto">
       <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">

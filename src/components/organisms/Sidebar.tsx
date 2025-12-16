@@ -1,20 +1,17 @@
 "use client";
 
-
 import { ADMIN } from "@/constants/constants";
 import { useAuth } from "@/context/AuthContext";
 import { UserRole } from "@/types";
-import {
-  Home,
-  List,
-  LogOut,
-  Plus,
-  Shield,
-  Users
-} from "lucide-react";
+import { Home, List, LogOut, Plus, Shield, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+
+/**
+ * Sidebar Component
+ * Navigation sidebar with role-based menu items
+ */
 
 interface SidebarProps {
   role: UserRole;
@@ -30,16 +27,17 @@ type View =
   | "detail";
 
 export default function Sidebar({ role }: SidebarProps) {
-
   const { logout } = useAuth();
   const pathname = usePathname();
 
+  // Menu items for coder role
   const coderMenuItems = [
     { id: "dashboard", url: "/coder", icon: Home, label: "Dashboard" },
     { id: "create", url: "/tickets/create", icon: Plus, label: "Nuevo Ticket" },
     { id: "tickets", url: "/tickets", icon: List, label: "Mis Tickets" },
   ];
 
+  // Menu items for admin role
   const adminMenuItems = [
     { id: "dashboard", url: "/admin", icon: Home, label: "Dashboard" },
     {
@@ -52,37 +50,35 @@ export default function Sidebar({ role }: SidebarProps) {
     { id: "users", url: "/users", icon: Users, label: "Usuarios" },
   ];
 
+  // Update active view based on current path
   useEffect(() => {
     const path = pathname;
     const allMenuItems = [...coderMenuItems, ...adminMenuItems];
-    const matchedItem = allMenuItems.find(item => item.url === path);
-    
+    const matchedItem = allMenuItems.find((item) => item.url === path);
+
     if (matchedItem) {
       handleViewChange(matchedItem.id);
     }
   }, [pathname]);
 
+  // Select menu based on role
   const menuItems = role === ADMIN ? adminMenuItems : coderMenuItems;
 
   const [currentView, setCurrentView] = useState<View>("dashboard");
 
+  // Handle logout action
   const handleLogout = () => {
-    logout()
+    logout();
   };
 
+  // Handle view change and update active state
   const handleViewChange = (view: string) => {
     setCurrentView(view as View);
-
-
-    // setSelectedTicket(null);
   };
-
-
-
 
   return (
     <aside className="w-64 sticky top-0 left-0 h-svh z-10 bg-[#1A1A2E] text-white flex flex-col overflow-hidden">
-      {/* Logo */}
+      {/* Logo section */}
       <div className="px-6 py-4 my-auto border-b border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#5C3DFF] to-[#7D5CFF] flex items-center justify-center">
@@ -98,7 +94,7 @@ export default function Sidebar({ role }: SidebarProps) {
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation menu */}
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {menuItems.map((item) => {
@@ -124,7 +120,7 @@ export default function Sidebar({ role }: SidebarProps) {
         </div>
       </nav>
 
-      {/* Footer */}
+      {/* Footer with logout and status */}
       <div className="p-4 border-t border-gray-700">
         <button
           onClick={handleLogout}
@@ -134,6 +130,7 @@ export default function Sidebar({ role }: SidebarProps) {
           <span className="text-sm font-medium">Cerrar Sesión</span>
         </button>
 
+        {/* System status indicator */}
         <div className="mt-4 px-4">
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>

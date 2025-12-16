@@ -2,10 +2,13 @@ import api from "@/lib/api/axiosInterceptor";
 import { LoginResponse, User } from "@/types/user";
 import { jwtDecode } from "jwt-decode";
 
-export const authService = {
+// Authentication service for handling login
+
+export const authService = { // User login function
   login: async (email: string, password: string): Promise<User> => {
     try {
       const response = await api.post<LoginResponse>("/auth/login", {
+        // Send login request to API
         email,
         password,
       });
